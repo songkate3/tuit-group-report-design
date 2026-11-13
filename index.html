@@ -42,8 +42,8 @@ body.onlyM #report{justify-content:center}
 <header>
   <h1>튜잇 그룹수업 리포트 디자인</h1>
   <div class="tabs" role="tablist" aria-label="화면 종류">
-    <button role="tab" id="tabReport" aria-selected="true" aria-controls="report">리포트 화면</button>
-    <button role="tab" id="tabGuide" aria-selected="false" aria-controls="guide">디자인 가이드</button>
+    <button role="tab" id="tabGuide" aria-selected="true" aria-controls="guide">디자인 가이드</button>
+    <button role="tab" id="tabReport" aria-selected="false" aria-controls="report">리포트 화면</button>
   </div>
   <div class="modes" id="modes" aria-label="보기 방식">
     <span>보기</span>
@@ -58,7 +58,7 @@ body.onlyM #report{justify-content:center}
   <label class="sync" id="syncWrap"><input type="checkbox" id="sync" checked> 같이 스크롤</label>
 </header>
 <main>
-  <section class="view on" id="report" role="tabpanel" aria-labelledby="tabReport">
+  <section class="view" id="report" role="tabpanel" aria-labelledby="tabReport">
     <div class="col" id="colM">
       <h2>모바일 · 390px</h2>
       <div class="scroll" id="scM"><div class="stage" id="stM"><iframe id="ifM" title="모바일 리포트" src="mobile/Final_v3.dc.html" scrolling="no"></iframe></div></div>
@@ -68,7 +68,7 @@ body.onlyM #report{justify-content:center}
       <div class="scroll" id="scP"><div class="stage" id="stP"><iframe id="ifP" title="PC 리포트" src="pc/Final_PC_v3.dc.html" scrolling="no"></iframe></div></div>
     </div>
   </section>
-  <section class="view" id="guide" role="tabpanel" aria-labelledby="tabGuide">
+  <section class="view on" id="guide" role="tabpanel" aria-labelledby="tabGuide">
     <div class="col">
       <h2>디자인 가이드 v1.2 · 1120px <span id="gScale"></span></h2>
       <div class="scroll" id="scG"><div class="stage" id="stG"><iframe id="ifG" title="디자인 가이드" data-src="guide/Guide.dc.html" scrolling="no"></iframe></div></div>
@@ -117,6 +117,7 @@ function readChapters(k) {
     var d = $('if' + k).contentDocument; if (!d) return null;
     var hs = d.querySelectorAll('h2'); if (hs.length < 3) return null;
     var ys = []; for (var i = 0; i < hs.length; i++) { ys.push(hs[i].getBoundingClientRect().top + (d.defaultView.scrollY || 0) - 70); }
+    if (ys[ys.length - 1] - ys[0] < 100) return null;   // 탭이 가려져 있을 때는 위치를 못 읽음
     return ys;
   } catch (e) { return null; }
 }
@@ -177,13 +178,14 @@ function tab(which) {
   $('jump').hidden = !(rep && chapters.M && chapters.P);
   var g = $('ifG'); if (!rep && !g.getAttribute('src')) g.setAttribute('src', g.dataset.src);   // 가이드는 탭을 처음 열 때 불러옴
   layout();
+  if (rep && !(chapters.M && chapters.P)) tryChapters(10);
 }
 $('tabReport').onclick = function () { tab('report'); };
 $('tabGuide').onclick = function () { tab('guide'); };
 window.addEventListener('resize', layout);
 $('ifM').addEventListener('load', function () { tryChapters(10); });
 $('ifP').addEventListener('load', function () { tryChapters(10); });
-layout();
+tab('guide');   // 처음 열면 디자인 가이드 탭
 </script>
 </body>
 </html>
